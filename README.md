@@ -2,32 +2,82 @@
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
 
-In this project, your goal is to write a software pipeline to detect vehicles in a video (start with the test_video.mp4 and later implement on full project_video.mp4), but the main output or product we want you to create is a detailed writeup of the project.  Check out the [writeup template](https://github.com/udacity/CarND-Vehicle-Detection/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup.  
+[image2]: ./output_images/bin.png "Before undistort image based on camera calibration"
+[image3]: ./output_images/hist.png "Before flipping"
+[image4]: ./output_images/hog.png "Before flipping"
+[image5]: ./output_images/windows.png "Before flipping"
+[image6]: ./output_images/heatmap.png "Shadowed image"
+[image7]: ./output_images/predicted.png "Shadowed image"
+[image8]: ./output_images/final_video.png "Shadowed image"
+[image9]: ./output_images/augment_img.png "Shadowed image"
 
-Creating a great writeup:
----
-A great writeup should include the rubric points as well as your description of how you addressed each point.  You should include a detailed description of the code used in each step (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
+In this project I created vehicle detection pipeline using Linear Support Vector Machine model. 
+To implement This pipeline I have to apply features extracting techniques to extract features for classification model and sliding windows techinque to capture one vehicle in the whole image. 
 
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
-
-You can submit your writeup in markdown or use another method and submit a pdf instead.
 
 The Project
 ---
 
 The goals / steps of this project are the following:
+* 1. Extract Features with following techniques. 
+     * (1) Using raw pixel value by reducing their size which is useful to detect image that are not varing their appearance.  
+    * (2) Using histogram of colors to detect color difference between car & Non-car values. 
+    * (3) HOG features to capture direction of the gradient. This impose strong value to the parts of image which show great variation in shape while impose small value to an parts of image where show small variation  by noise.  
+* 2 Fit the features to Linear Support Vector Machine model. 
+* 3 Make a sliding windows to apply Machine Learning model for vehicle and non-vehicle classification.
+* 4 Heatmap thresholding to detect False Positive. 
 
-* Perform a Histogram of Oriented Gradients (HOG) feature extraction on a labeled training set of images and train a classifier Linear SVM classifier
-* Optionally, you can also apply a color transform and append binned color features, as well as histograms of color, to your HOG feature vector. 
-* Note: for those first two steps don't forget to normalize your features and randomize a selection for training and testing.
-* Implement a sliding-window technique and use your trained classifier to search for vehicles in images.
-* Run your pipeline on a video stream (start with the test_video.mp4 and later implement on full project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
-* Estimate a bounding box for vehicles detected.
 
-Here are links to the labeled data for [vehicle](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/vehicles.zip) and [non-vehicle](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/non-vehicles.zip) examples to train your classifier.  These example images come from a combination of the [GTI vehicle image database](http://www.gti.ssr.upm.es/data/Vehicle_database.html), the [KITTI vision benchmark suite](http://www.cvlibs.net/datasets/kitti/), and examples extracted from the project video itself.   You are welcome and encouraged to take advantage of the recently released [Udacity labeled dataset](https://github.com/udacity/self-driving-car/tree/master/annotations) to augment your training data.  
+* The data used for model fitting is stored in vehicles and non-vehicles folder.
+* You can skip the model fitting part by loading .sav and .npy files 
 
-Some example images for testing your pipeline on single frames are located in the `test_images` folder.  To help the reviewer examine your work, please save examples of the output from each stage of your pipeline in the folder called `ouput_images`, and include them in your writeup for the project by describing what each image shows.    The video called `project_video.mp4` is the video your pipeline should work well on.  
+Extract Features
+---
 
-**As an optional challenge** Once you have a working pipeline for vehicle detection, add in your lane-finding algorithm from the last project to do simultaneous lane-finding and vehicle detection!
+### Using raw pixel
+* Using raw pixel value of reduced size image. 
+![alt text][image2]
 
-**If you're feeling ambitious** (also totally optional though), don't stop there!  We encourage you to go out and take video of your own, and show us how you would implement this project on a new video!
+### Using Color Histogram of the Image. 
+* By comparing histogram of various color space we can verify that pixel value vary most in the hsv color space. 
+![alt text][image3]
+
+### Get histogram of oriented gradients
+* By capturing the intensity of the gradient in each region of image we can use it as features for classification model. 
+![alt text][image4]
+
+
+### Combining features 
+* I choosed hsv as a color space which show greatest variation in histogram. 
+* Choosed 9 orientations on HOG features. 8 pixel per cell and 2 cell per blocks as hog parameters. 
+* Used 16 * 16 as a size for spatial features. 
+
+Fit the features to Linear Support Vector Machine model. 
+---
+* Considering the model implementation time and avoid local minimum problem I choosed SVM machine rather than NN. 
+* Didn't try to implement non-linear kernel since model show high accuracy on test data set. (98.81%)
+
+Transform Image by sliding windows. 
+---
+* To apply fitted SVC model from previous steps we need to follow these steps. 
+    * (1) Get hog features of road image with center camera on the vehicle. 
+    * (2) Slide image with pre-defined window size append spatials bins and color bins as featues with hog features from step1. 
+    * (3) We can adjust window size. We need to use bigger windows on closer car and smaller windows on car with great distances. 
+    * (4) From the features of each window predict if each window image is car or not. If predicted value of window is car return window as a point
+![alt text][image5]
+
+Heatmap thresholding to detect False Positive. 
+---
+* To handle False Positive detect heat map of positive windows and choose positive windows that meat certain threshold.
+![alt text][image6]
+![alt text][image7]
+
+Final result
+---
+[![alt text][image8]](https://youtu.be/sGH4k4GTAPk)
+
+Discussion.
+---
+* I have tried to implement PCA for dimensional reduction for more robust model implementaion however it impose much time on features implementation so I decided not to use on this project. 
+* I have spent so much time because of scailing difference between jpg and png format. 
+* I could use deep learning model to make better detection.
