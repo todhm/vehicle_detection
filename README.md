@@ -26,7 +26,7 @@ The goals / steps of this project are the following:
 * 2 Fit the features to Linear Support Vector Machine model. 
 * 3 Make a sliding windows to apply Machine Learning model for vehicle and non-vehicle classification.
 * 4 Heatmap thresholding to detect False Positive. 
-
+* 5 Define class to save recent detected vehicles on video.  
 
 * The data used for model fitting is stored in vehicles and non-vehicles folder.
 * You can skip the model fitting part by loading .sav and .npy files 
@@ -71,6 +71,11 @@ Heatmap thresholding to detect False Positive.
 * To handle False Positive detect heat map of positive windows and choose positive windows that meat certain threshold.
 ![alt text][image6]
 ![alt text][image7]
+
+Define class to save recent detected vehicles on video.  
+---
+* I have defined hot window classes to update constantly for more robust detection of image. 
+* By using recent 7 detected windows we can detect vehicles from video that show great signs. 
 
 Final result
 ---
