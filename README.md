@@ -63,7 +63,8 @@ Transform Image by sliding windows.
     * (1) Get hog features of road image with center camera on the vehicle. 
     * (2) Slide image with pre-defined window size append spatials bins and color bins as featues with hog features from step1. 
     * (3) We can adjust window size. We need to use bigger windows on closer car and smaller windows on car with great distances. 
-    * (4) From the features of each window predict if each window image is car or not. If predicted value of window is car return window as a point
+    * (4) Apply pipeline we used to extract features on model training steps and extract features from each windows. 
+    * (5) Calculate decision function of each windows based on model.  If the decision function value of model exeed 0.6 draw rectangle.
 ![alt text][image5]
 
 Heatmap thresholding to detect False Positive. 
@@ -79,7 +80,7 @@ Define class to save recent detected vehicles on video.
 
 Final result
 ---
-[![alt text][image8]](https://youtu.be/sGH4k4GTAPk)
+[![alt text][image8]](https://youtu.be/gyB4T4aNTts)
 
 Discussion.
 ---
